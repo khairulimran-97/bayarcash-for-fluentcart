@@ -1,0 +1,56 @@
+{
+    "name": "webimpian/bayarcash-for-fluentcart",
+    "description": "Bayarcash Payment Gateway for FluentCart",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0-or-later",
+    "keywords": [
+        "wordpress",
+        "plugin",
+        "fluentcart",
+        "bayarcash",
+        "payment",
+        "gateway",
+        "fpx",
+        "duitnow"
+    ],
+    "authors": [
+        {
+            "name": "Webimpian",
+            "email": "info@webimpian.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "webimpian/bayarcash-php-sdk": "^1.0"
+    },
+    "require-dev": {
+        "php": ">=7.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "BayarcashForFluentCart\\": "includes/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "classmap-authoritative": false,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "*": true
+        },
+        "platform": {
+            "php": "7.4"
+        }
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@composer dump-autoload --optimize"
+        ],
+        "post-update-cmd": [
+            "@composer dump-autoload --optimize"
+        ]
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
