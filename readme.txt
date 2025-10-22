@@ -1,8 +1,8 @@
 === Bayarcash for FluentCart ===
 Contributors: webimpian
-Tags: bayarcash, payment gateway, fluentcart, fpx, duitnow, malaysia payment
+Tags: bayarcash, payment gateway, fluentcart, fpx, duitnow
 Requires at least: 5.0
-Tested up to: 6.7
+Tested up to: 6.8
 Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -50,7 +50,7 @@ Bayarcash for FluentCart is a powerful payment gateway integration that enables 
 
 1. Upload the `bayarcash-for-fluentcart` folder to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
-3. Navigate to FluentCart > Settings > Payment Gateways
+3. Navigate to FluentCart > Settings > Payments (/wp-admin/admin.php?page=fluent-cart#/settings/payments)
 4. Configure your Bayarcash API credentials
 5. Select your preferred payment channels
 6. Save settings and start accepting payments

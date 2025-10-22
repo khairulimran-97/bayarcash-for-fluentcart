@@ -67,7 +67,7 @@ Bayarcash for FluentCart is a comprehensive payment gateway integration that ena
 
 ### 2. Configure Plugin
 
-1. Go to **FluentCart → Settings → Payment Gateways**
+1. Go to **FluentCart → Settings → Payments** (`/wp-admin/admin.php?page=fluent-cart#/settings/payments`)
 2. Find "Bayarcash" and click configure
 3. Enter your API credentials
 4. Select payment channels to enable

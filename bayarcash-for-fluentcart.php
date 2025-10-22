@@ -7,7 +7,6 @@
  * Author: Webimpian
  * Author URI: https://webimpian.com
  * Text Domain: bayarcash-for-fluentcart
- * Domain Path: /languages
  * Requires at least: 5.0
  * Requires PHP: 7.4
  * License: GPL v2 or later
@@ -23,7 +22,7 @@ define('BAYARCASH_FC_URL', plugin_dir_url(__FILE__));
 if (!file_exists(BAYARCASH_FC_DIR . 'vendor/autoload.php')) {
     add_action('admin_notices', function() {
         echo '<div class="notice notice-error"><p>';
-        printf(
+        echo wp_kses_post(
             __('Bayarcash for FluentCart: Composer dependencies are missing. Please run <code>composer install</code> in the plugin directory.', 'bayarcash-for-fluentcart')
         );
         echo '</p></div>';
@@ -49,7 +48,7 @@ add_action('template_redirect', function() {
 }, 5);
 
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) {
-    $settings_link = '<a href="' . admin_url('admin.php?page=fluent-cart#/settings/payment-gateways') . '">' . __('Settings', 'bayarcash-for-fluentcart') . '</a>';
+    $settings_link = '<a href="' . admin_url('admin.php?page=fluent-cart#/settings/payments') . '">' . __('Settings', 'bayarcash-for-fluentcart') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 });
@@ -57,7 +56,7 @@ add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) 
 add_action('admin_notices', function() {
     if (!defined('FLUENTCART_VERSION')) {
         echo '<div class="notice notice-error"><p>';
-        echo __('Bayarcash for FluentCart requires FluentCart to be installed and activated.', 'bayarcash-for-fluentcart');
+        echo esc_html__('Bayarcash for FluentCart requires FluentCart to be installed and activated.', 'bayarcash-for-fluentcart');
         echo '</p></div>';
     }
 });

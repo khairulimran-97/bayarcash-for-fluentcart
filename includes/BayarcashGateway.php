@@ -61,6 +61,7 @@ class BayarcashGateway extends AbstractPaymentGateway
                     </div>',
                     __('Accept payments via Bayarcash payment gateway. Supports FPX, DuitNow QR, and other Malaysian payment methods.', 'bayarcash-for-fluentcart'),
                     sprintf(
+                        /* translators: %s: URL to Bayarcash Dashboard */
                         __('Get your API credentials from <a href="%s" target="_blank">Bayarcash Dashboard</a>', 'bayarcash-for-fluentcart'),
                         'https://bayarcash.com'
                     )
@@ -211,14 +212,15 @@ class BayarcashGateway extends AbstractPaymentGateway
         }
 
         $selectedChannel = null;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         if (isset($_REQUEST['bayarcash_selected_channel'])) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             $selectedChannel = intval($_REQUEST['bayarcash_selected_channel']);
         }
 
         $result = $this->processor->createPayment($order, $transaction, $selectedChannel);
 
         if (is_wp_error($result)) {
-            error_log('Bayarcash Gateway Error: ' . $result->get_error_message());
             return [
                 'status' => 'failed',
                 'message' => $result->get_error_message()
@@ -233,7 +235,6 @@ class BayarcashGateway extends AbstractPaymentGateway
             ];
         }
 
-        error_log('Bayarcash Gateway Error: No payment URL in result');
         return [
             'status' => 'failed',
             'message' => __('Failed to create payment', 'bayarcash-for-fluentcart')
@@ -242,6 +243,7 @@ class BayarcashGateway extends AbstractPaymentGateway
 
     public function handleIPN()
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing
         $callbackData = $_POST;
 
         $result = $this->processor->handleCallback($callbackData);
