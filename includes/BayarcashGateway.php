@@ -317,4 +317,19 @@ class BayarcashGateway extends AbstractPaymentGateway
             ]
         ];
     }
+
+    /**
+     * Get order info for frontend
+     * This is called from the frontend checkout to get payment data
+     *
+     * @param array $data
+     * @return void
+     */
+    public function getOrderInfo(array $data)
+    {
+        // For redirect-based payments like Bayarcash, we don't need to return
+        // complex payment info to the frontend. The payment is handled via
+        // makePaymentFromPaymentInstance which redirects to Bayarcash.
+        // This method is required by the PaymentGatewayInterface.
+    }
 }
