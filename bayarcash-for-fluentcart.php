@@ -4,11 +4,12 @@
  * Plugin URI: https://github.com/webimpian/bayarcash-php-sdk
  * Description: Accept payments via Bayarcash payment gateway for FluentCart
  * Version: 1.0.0
- * Author: Webimpian
+ * Author: Web Impian Sdn Bhd
  * Author URI: https://webimpian.com
  * Text Domain: bayarcash-for-fluentcart
  * Requires at least: 5.0
  * Requires PHP: 7.4
+ * Requires Plugins: fluent-cart
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */

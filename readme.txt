@@ -39,6 +39,47 @@ Bayarcash for FluentCart is a powerful payment gateway integration that enables 
 * WeChat Pay
 * PromptPay
 
+= API & SDK Information =
+
+This plugin integrates with external services to process payments:
+
+**Bayarcash Payment API v3**
+* Service: Bayarcash Payment Gateway (https://bayarcash.com)
+* API Documentation: https://docs.bayarcash.com
+* Purpose: Process payment transactions and handle payment callbacks
+* Service Terms: https://bayarcash.com/terms
+* Privacy Policy: https://bayarcash.com/privacy
+
+**SDK Used:**
+* Bayarcash PHP SDK v2.0.5
+* Repository: https://github.com/webimpian/bayarcash-php-sdk
+* License: MIT License
+
+= Data Collection & Privacy =
+
+**What data is sent to Bayarcash:**
+
+When a customer makes a payment, the following information is transmitted to Bayarcash's secure servers:
+
+* Order ID and amount
+* Customer name and email address
+* Customer phone number
+* Selected payment channel
+* Return URL and callback URL
+
+**Data Processing:**
+* All payment data is transmitted securely via HTTPS
+* Payment information is processed by Bayarcash in accordance with their privacy policy
+* Transaction IDs and payment status are returned and stored in your WordPress database
+* No credit card details are stored on your server - all sensitive payment data is handled by Bayarcash
+
+**Callbacks & Webhooks:**
+* Bayarcash sends payment status updates to your site via secure callbacks
+* All callbacks are verified using cryptographic checksums to prevent tampering
+* Your site stores transaction metadata (transaction IDs, status, payment channel) for order management
+
+By using this plugin, you acknowledge that customer payment data will be transmitted to Bayarcash for processing. Please ensure your privacy policy reflects this third-party data processing.
+
 = Requirements =
 
 * FluentCart plugin (active)
@@ -88,6 +129,14 @@ Yes, all transactions are secured with checksum validation and use HTTPS. Paymen
 = What happens if a payment fails? =
 
 Failed payments are automatically logged and the order status is updated accordingly. Customers are redirected back to your store with appropriate error messages.
+
+= What data is sent to external services? =
+
+This plugin sends payment transaction data to Bayarcash (https://bayarcash.com) for processing payments. This includes order details, customer information (name, email, phone), and payment amount. All data is transmitted securely via HTTPS and validated with cryptographic checksums. Please refer to Bayarcash's privacy policy for information on how they handle payment data.
+
+= Does this plugin comply with privacy regulations? =
+
+The plugin itself does not collect or store any personal data beyond what FluentCart already collects. Payment processing is handled by Bayarcash, a PCI-DSS compliant payment gateway. However, as the site owner, you are responsible for disclosing to your customers that their payment data will be processed by Bayarcash. Please update your privacy policy accordingly.
 
 == Screenshots ==
 
