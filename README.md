@@ -1,105 +1,110 @@
 # Bayarcash for FluentCart
 
-Accept payments via Bayarcash payment gateway for FluentCart - Supporting FPX, DuitNow QR, and other Malaysian payment methods.
+[![WordPress Plugin Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/webimpian/bayarcash-for-fluentcart)
+[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-purple.svg)](https://php.net)
+[![License](https://img.shields.io/badge/license-GPL--2.0%2B-green.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
+
+Accept payments via Bayarcash payment gateway for FluentCart. Supports FPX, DuitNow QR, Credit Card, and other Malaysian payment methods.
 
 ## Description
 
-This plugin integrates Bayarcash payment gateway with FluentCart, allowing you to accept payments through various Malaysian payment channels including:
+Bayarcash for FluentCart is a comprehensive payment gateway integration that enables Malaysian businesses to accept online payments seamlessly. The plugin connects your FluentCart store with Bayarcash, providing access to 13+ popular payment channels in Malaysia.
 
-- FPX (Financial Process Exchange)
-- DuitNow QR
-- And other payment methods supported by Bayarcash
+## Features
+
+- ✅ **Multiple Payment Channels** - FPX, DuitNow QR, Credit Card, and more
+- ✅ **Secure Transactions** - Checksum validation for all payments
+- ✅ **Real-time Callbacks** - Instant order updates via webhooks and return URLs
+- ✅ **Test Mode** - Built-in sandbox credentials for testing
+- ✅ **Customizable UI** - Customize button colors, text, and checkout theme
+- ✅ **Complete Audit Trail** - All transaction metadata stored in order meta
+- ✅ **Status Protection** - Prevents modification of paid/refunded orders
+- ✅ **Payment Intent Tracking** - Maintains payment intent ID throughout lifecycle
+
+## Supported Payment Channels
+
+| Channel ID | Payment Method |
+|------------|----------------|
+| 1 | FPX (Online Banking) |
+| 3 | FPX Direct Debit |
+| 4 | FPX Line of Credit |
+| 5 | DuitNow Online Banking/Wallets |
+| 6 | DuitNow QR |
+| 8 | Boost PayFlex |
+| 9 | QRIS (Online Banking) |
+| 10 | QRIS (E-Wallet) |
+| 11 | NETS |
+| 12 | Credit Card |
+| 13 | Alipay |
+| 14 | WeChat Pay |
+| 15 | PromptPay |
 
 ## Requirements
 
 - WordPress 5.0 or higher
 - PHP 7.4 or higher
 - FluentCart plugin (active)
-- Composer (for installing dependencies)
-- Bayarcash account with API credentials
+- Bayarcash merchant account
+- SSL certificate (HTTPS)
 
 ## Installation
 
-### 1. Install the Plugin
-
-Download or clone this repository into your WordPress plugins directory:
-
-```bash
-cd wp-content/plugins/
-git clone https://github.com/webimpian/bayarcash-for-fluentcart.git
-```
-
-### 2. Install Dependencies
-
-Navigate to the plugin directory and install Composer dependencies:
-
-```bash
-cd bayarcash-for-fluentcart
-composer install
-```
-
-### 3. Activate the Plugin
-
-1. Go to WordPress Admin → Plugins
-2. Find "Bayarcash for FluentCart"
-3. Click "Activate"
+1. Upload `bayarcash-for-fluentcart` folder to `/wp-content/plugins/`
+2. Run `composer install` in the plugin directory to install dependencies
+3. Activate the plugin through WordPress admin
 
 ## Configuration
 
-### 1. Get Bayarcash API Credentials
+### 1. Get API Credentials
 
-1. Log in to your Bayarcash account
-2. Navigate to Settings → API Credentials
-3. Copy your API Token and API Secret Key
-4. Note your Portal Key
+1. Sign up at [Bayarcash](https://bayarcash.com)
+2. Log in to your dashboard
+3. Navigate to API Settings
+4. Copy your credentials:
+   - Personal Access Token (PAT)
+   - API Secret Key
+   - Portal Key
 
-### 2. Configure the Gateway
+### 2. Configure Plugin
 
-1. Go to FluentCart → Settings → Payment Gateways
-2. Find "Bayarcash" and click to configure
-3. Fill in the required settings:
-   - **Enable/Disable**: Check to enable Bayarcash payments
-   - **Payment Mode**: Select "Test Mode" for testing or "Live Mode" for production
-   - **Test API Token**: Your Bayarcash test API token
-   - **Test API Secret Key**: Your Bayarcash test API secret key
-   - **Live API Token**: Your Bayarcash live API token
-   - **Live API Secret Key**: Your Bayarcash live API secret key
-   - **Portal Key**: Your Bayarcash portal key
-   - **Payment Description**: Custom description shown to customers (use `{{order_id}}` for order number)
-   - **Payment Button Label**: Text displayed on the payment button
+1. Go to **FluentCart → Settings → Payment Gateways**
+2. Find "Bayarcash" and click configure
+3. Enter your API credentials
+4. Select payment channels to enable
+5. Customize checkout appearance (optional)
+6. Save settings
 
-### 3. Set Up Webhooks
+### 3. Test Mode
 
-Configure the following webhook URL in your Bayarcash account:
-
-```
-https://yoursite.com/?fluent_cart_payment_api=1&payment_method=bayarcash&action=callback
-```
-
-Replace `yoursite.com` with your actual domain.
+For testing, simply set your FluentCart store to **Test Mode**. The plugin will automatically use sandbox credentials.
 
 ## Usage
 
-Once configured, Bayarcash will appear as a payment option during checkout. Customers will be redirected to Bayarcash's secure payment page to complete their payment.
+### Customer Checkout Flow
 
-### Payment Flow
-
-1. Customer selects Bayarcash as payment method
-2. Customer clicks "Pay with Bayarcash" button
-3. Redirected to Bayarcash payment page
-4. Customer selects payment method (FPX, DuitNow QR, etc.)
+1. Customer selects Bayarcash at checkout
+2. Customer chooses payment channel (FPX, DuitNow QR, etc.)
+3. Customer clicks "Pay with Bayarcash"
+4. Redirected to Bayarcash payment page
 5. Completes payment
-6. Redirected back to your site
-7. Order status updated based on payment result
+6. Redirected back to receipt page
+7. Order status updated automatically
 
-## Features
+### Order Metadata
 
-- ✅ Direct payment integration (no subscription support)
-- ✅ Support for multiple payment channels
-- ✅ Test and Live mode support
-- ✅ Secure webhook callback handling
-- ✅ Automatic order status updates
-- ✅ Clean and modern checkout experience
+The plugin stores comprehensive transaction data:
+
+- `bayarcash_transaction_id` - Bayarcash transaction ID
+- `bayarcash_exchange_reference_number` - Exchange reference
+- `bayarcash_exchange_transaction_id` - Bank transaction ID
+- `bayarcash_status_description` - Payment status description
+- `bayarcash_payment_gateway_id` - Payment channel used
+
+### Transaction Tracking
+
+- **Payment Intent ID** stored in `vendor_charge_id` (never changes)
+- **Transaction ID** stored in order meta
+- **Payment Channel** stored in `payment_method_type`
 
 ## Development
 
@@ -108,72 +113,104 @@ Once configured, Bayarcash will appear as a payment option during checkout. Cust
 ```
 bayarcash-for-fluentcart/
 ├── assets/
-│   ├── images/          # Logo and images
-│   └── js/              # Frontend JavaScript
+│   ├── img/
+│   │   └── bayarcash-icon.png
+│   └── js/
 │       └── bayarcash-checkout.js
-├── includes/            # Core plugin classes
-│   ├── BayarcashGateway.php
-│   ├── BayarcashSettings.php
-│   └── BayarcashProcessor.php
-├── vendor/              # Composer dependencies (gitignored)
-├── bayarcash-for-fluentcart.php  # Main plugin file
-├── composer.json        # Composer configuration
-└── README.md
+├── includes/
+│   ├── BayarcashGateway.php      # Main gateway class
+│   ├── BayarcashProcessor.php     # Payment processing
+│   └── BayarcashSettings.php      # Settings management
+├── vendor/                         # Composer dependencies
+├── bayarcash-for-fluentcart.php   # Main plugin file
+├── composer.json
+├── readme.txt                      # WordPress repo readme
+└── README.md                       # This file
 ```
 
-### Hooks and Filters
+### Payment Flow
 
-The plugin uses FluentCart's standard payment gateway hooks:
-
-- `fluent_cart/register_payment_methods` - Register the gateway
-- Payment callbacks via FluentCart's API router
-
-## Troubleshooting
-
-### Composer Dependencies Not Installed
-
-If you see an error about missing dependencies:
-
-```bash
-cd wp-content/plugins/bayarcash-for-fluentcart
-composer install
+```
+User Checkout
+    ↓
+Create Payment Intent → Store payment_intent_id in vendor_charge_id
+    ↓
+Redirect to Bayarcash
+    ↓
+User Completes Payment
+    ↓
+├─→ Callback (POST) → Update order meta → Mark as paid
+└─→ Return URL (GET) → Update order meta → Redirect to receipt
 ```
 
-### Payment Not Working
+### Hooks & Filters
 
-1. Verify API credentials are correct
-2. Check payment mode (test/live) matches your credentials
-3. Ensure webhook URL is configured in Bayarcash dashboard
-4. Check WordPress error logs for detailed error messages
+Register custom payment method:
+```php
+add_action('fluent_cart/register_payment_methods', function() {
+    $gateway = new \BayarcashForFluentCart\BayarcashGateway();
+    fluent_cart_api()->registerCustomPaymentMethod('bayarcash', $gateway);
+});
+```
 
-### Webhook Not Receiving Callbacks
+Process return URL:
+```php
+add_action('template_redirect', function() {
+    $processor->handleReturn();
+}, 5);
+```
 
-1. Verify webhook URL is correctly configured in Bayarcash
-2. Check that your server accepts POST requests to the webhook URL
-3. Verify SSL certificate is valid if using HTTPS
+## API Integration
+
+### Bayarcash SDK
+
+The plugin uses [Bayarcash PHP SDK v2.0.5](https://github.com/webimpian/bayarcash-php-sdk):
+
+```php
+$client = new Bayarcash($apiToken);
+$client->setApiVersion('v3');
+$client->useSandbox(); // For test mode
+
+$response = $client->createPaymentIntent($paymentData);
+$isValid = $client->verifyTransactionCallbackData($data, $secret);
+```
+
+## Security
+
+- ✅ Checksum validation for all callbacks
+- ✅ Return URL verification
+- ✅ Protected order status (paid/refunded)
+- ✅ Sanitized input data
+- ✅ HTTPS required for production
+- ✅ WordPress nonce verification
 
 ## Support
 
-For issues, questions, or contributions:
+- **Documentation**: [Bayarcash Docs](https://docs.bayarcash.com)
+- **Issues**: [GitHub Issues](https://github.com/webimpian/bayarcash-for-fluentcart/issues)
+- **Email**: support@webimpian.com
 
-- GitHub Issues: [https://github.com/webimpian/bayarcash-for-fluentcart/issues](https://github.com/webimpian/bayarcash-for-fluentcart/issues)
-- Bayarcash SDK: [https://github.com/webimpian/bayarcash-php-sdk](https://github.com/webimpian/bayarcash-php-sdk)
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-GPL v2 or later
+This plugin is licensed under the GPL v2 or later.
+
+```
+Copyright (C) 2024 Webimpian
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+```
 
 ## Credits
 
-- Developed by [Webimpian](https://webimpian.com)
-- Uses [Bayarcash PHP SDK](https://github.com/webimpian/bayarcash-php-sdk)
-- Built for [FluentCart](https://fluentcart.com)
+Developed by [Webimpian](https://webimpian.com)
 
-## Changelog
+---
 
-### 1.0.0
-- Initial release
-- Direct payment support
-- FPX and DuitNow QR support
-- Test and Live mode
-- Webhook integration
+**Made with ❤️ for Malaysian businesses**

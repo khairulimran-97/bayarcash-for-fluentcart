@@ -1,6 +1,3 @@
-/**
- * Bayarcash for FluentCart - Checkout Handler
- */
 (function($) {
     'use strict';
 
@@ -28,7 +25,7 @@
 
             container.innerHTML = '';
 
-            // Hide payment methods selector
+            
             const paymentMethods = this.form.querySelector('.fluent_cart_payment_methods');
             if (paymentMethods) {
                 paymentMethods.style.display = 'none';
@@ -38,7 +35,7 @@
         }
 
         createBayarcashButton(container) {
-            // Create channels accordion if available
+            
             if (this.paymentArgs.available_channels && this.paymentArgs.available_channels.length > 0) {
                 this.createChannelsAccordion(container);
             }
@@ -87,7 +84,7 @@
             secureText.textContent = this.translate('Secure payment powered by Bayarcash');
             container.appendChild(secureText);
 
-            // Remove loading indicator
+            
             const loadingElement = document.getElementById('fct_loading_payment_processor');
             if (loadingElement) {
                 loadingElement.remove();
@@ -104,7 +101,7 @@
                 overflow: hidden;
             `;
 
-            // Accordion header
+            
             const accordionHeader = document.createElement('div');
             accordionHeader.className = 'bayarcash-accordion-header';
             accordionHeader.style.cssText = `
@@ -130,7 +127,7 @@
             `;
             accordionHeader.appendChild(toggleIcon);
 
-            // Accordion content
+            
             const accordionContent = document.createElement('div');
             accordionContent.className = 'bayarcash-accordion-content';
             accordionContent.style.cssText = `
@@ -145,7 +142,7 @@
                 padding: 10px;
             `;
 
-            // Add each channel as radio button
+            
             this.paymentArgs.available_channels.forEach((channel, index) => {
                 const channelLabel = document.createElement('label');
                 channelLabel.className = 'bayarcash-channel-option';
@@ -179,7 +176,7 @@
                     flex: 1;
                 `;
 
-                // Function to update selected state
+                
                 const updateSelectedState = (label, isSelected) => {
                     if (isSelected) {
                         label.style.backgroundColor = '#e6f7ed';
@@ -192,7 +189,7 @@
                     }
                 };
 
-                // Highlight on hover
+                
                 channelLabel.addEventListener('mouseenter', () => {
                     if (!radioInput.checked) {
                         channelLabel.style.backgroundColor = '#e8e8e8';
@@ -205,18 +202,18 @@
                     }
                 });
 
-                // Update selection
+                
                 radioInput.addEventListener('change', () => {
                     this.selectedChannel = channel.id;
 
-                    // Update all labels
+                    
                     const allLabels = channelsList.querySelectorAll('.bayarcash-channel-option');
                     allLabels.forEach(label => {
                         const radio = label.querySelector('input[type="radio"]');
                         updateSelectedState(label, radio.checked);
                     });
 
-                    // Clear any error messages
+                    
                     const errorDiv = container.querySelector('.bayarcash-error-message');
                     if (errorDiv) {
                         errorDiv.remove();
@@ -227,12 +224,12 @@
                 channelLabel.appendChild(channelName);
                 channelsList.appendChild(channelLabel);
 
-                // Auto-select first channel is no longer done here
+                
             });
 
             accordionContent.appendChild(channelsList);
 
-            // Toggle functionality - start open
+            
             let isOpen = true;
             accordionHeader.addEventListener('click', () => {
                 isOpen = !isOpen;
@@ -249,7 +246,7 @@
             accordionWrapper.appendChild(accordionContent);
             container.appendChild(accordionWrapper);
 
-            // Open accordion by default
+            
             setTimeout(() => {
                 accordionContent.style.maxHeight = accordionContent.scrollHeight + 'px';
                 toggleIcon.style.transform = 'rotate(180deg)';
@@ -260,7 +257,7 @@
             const container = document.querySelector('.fluent-cart-checkout_embed_payment_container_bayarcash');
 
             try {
-                // Validate channel selection
+                
                 if (!this.selectedChannel) {
                     this.displayErrorMessage(container, this.translate('Please select a payment method'));
                     return;
@@ -270,7 +267,7 @@
                     this.paymentLoader.changeLoaderStatus('processing');
                 }
 
-                // Add selected channel to form data before processing
+                
                 if (this.selectedChannel) {
                     const channelInput = document.createElement('input');
                     channelInput.type = 'hidden';
@@ -282,21 +279,21 @@
                 if (typeof this.orderHandler === 'function') {
                     const orderData = await this.orderHandler();
 
-                    // Log response for debugging
+                    
                     console.log('Bayarcash Order Response:', orderData);
 
                     if (!orderData) {
                         throw new Error(this.translate('Failed to create order'));
                     }
 
-                    // Check for error in response
+                    
                     if (orderData.status === 'failed' || orderData.error) {
                         const errorMessage = orderData.message || orderData.error || this.translate('Failed to create order');
                         console.error('Bayarcash Error:', errorMessage);
                         throw new Error(errorMessage);
                     }
 
-                    // Redirect to Bayarcash payment page
+                    
                     if (orderData.redirect_to) {
                         if (this.paymentLoader) {
                             this.paymentLoader.changeLoaderStatus('redirecting');
@@ -322,7 +319,7 @@
         }
 
         displayErrorMessage(container, message) {
-            // Remove any existing error messages first
+            
             const existingError = container.querySelector('.bayarcash-error-message');
             if (existingError) {
                 existingError.remove();
@@ -343,7 +340,7 @@
         }
     }
 
-    // Listen for Bayarcash payment method selection
+    
     window.addEventListener('fluent_cart_load_payments_bayarcash', function(event) {
         const container = document.querySelector('.fluent-cart-checkout_embed_payment_container_bayarcash');
 
@@ -351,7 +348,7 @@
             container.innerHTML = '<div id="fct_loading_payment_processor">Loading Bayarcash...</div>';
         }
 
-        // Fetch payment info
+        
         fetch(event.detail.paymentInfoUrl, {
             method: 'POST',
             headers: {

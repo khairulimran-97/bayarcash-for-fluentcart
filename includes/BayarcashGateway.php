@@ -10,21 +10,9 @@ defined('ABSPATH') or exit;
 
 class BayarcashGateway extends AbstractPaymentGateway
 {
-    /**
-     * @var BayarcashProcessor
-     */
     public $processor;
-
-    /**
-     * Supported features
-     *
-     * @var array
-     */
     public array $supportedFeatures = ['payment'];
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         $settings = new BayarcashSettings();
@@ -37,19 +25,10 @@ class BayarcashGateway extends AbstractPaymentGateway
         });
     }
 
-    /**
-     * Boot method for additional initialization
-     */
     public function boot()
     {
-        // Additional initialization if needed
     }
 
-    /**
-     * Get gateway metadata
-     *
-     * @return array
-     */
     public function meta(): array
     {
         return [
@@ -66,11 +45,6 @@ class BayarcashGateway extends AbstractPaymentGateway
         ];
     }
 
-    /**
-     * Get gateway settings fields
-     *
-     * @return array
-     */
     public function fields(): array
     {
         return [
@@ -184,19 +158,11 @@ class BayarcashGateway extends AbstractPaymentGateway
         ];
     }
 
-    /**
-     * Validate gateway settings
-     * This method is called by FluentCart when trying to ACTIVATE the gateway (is_active = 'yes')
-     *
-     * @param array $data
-     * @return array
-     */
     public static function validateSettings($data): array
     {
         $storeSettings = new \FluentCart\Api\StoreSettings();
         $storeMode = $storeSettings->get('order_mode');
 
-        // Validate credentials for both test and live mode
         $apiToken = trim($data['live_api_token'] ?? '');
         $apiSecret = trim($data['live_api_secret'] ?? '');
         $portalKey = trim($data['portal_key'] ?? '');
@@ -232,18 +198,11 @@ class BayarcashGateway extends AbstractPaymentGateway
         ];
     }
 
-    /**
-     * Process payment from payment instance
-     *
-     * @param PaymentInstance $paymentInstance
-     * @return array
-     */
     public function makePaymentFromPaymentInstance(PaymentInstance $paymentInstance)
     {
         $order = $paymentInstance->order;
         $transaction = $paymentInstance->transaction;
 
-        // Check if gateway is configured
         if (!$this->settings->isConfigured()) {
             return [
                 'status' => 'failed',
@@ -251,13 +210,11 @@ class BayarcashGateway extends AbstractPaymentGateway
             ];
         }
 
-        // Get selected payment channel from request
         $selectedChannel = null;
         if (isset($_REQUEST['bayarcash_selected_channel'])) {
             $selectedChannel = intval($_REQUEST['bayarcash_selected_channel']);
         }
 
-        // Create payment
         $result = $this->processor->createPayment($order, $transaction, $selectedChannel);
 
         if (is_wp_error($result)) {
@@ -283,12 +240,6 @@ class BayarcashGateway extends AbstractPaymentGateway
         ];
     }
 
-    /**
-     * Handle IPN callback from Bayarcash (Server-to-Server POST)
-     * Note: This is for backup/webhook support when not localhost
-     *
-     * @return void
-     */
     public function handleIPN()
     {
         $callbackData = $_POST;
@@ -312,12 +263,6 @@ class BayarcashGateway extends AbstractPaymentGateway
         exit;
     }
 
-    /**
-     * Get enqueue script source
-     *
-     * @param string $hasSubscription
-     * @return array
-     */
     public function getEnqueueScriptSrc($hasSubscription = 'no'): array
     {
         return [
@@ -330,11 +275,6 @@ class BayarcashGateway extends AbstractPaymentGateway
         ];
     }
 
-    /**
-     * Get localized script data
-     *
-     * @return array
-     */
     public function getLocalizeData(): array
     {
         return [
@@ -352,19 +292,11 @@ class BayarcashGateway extends AbstractPaymentGateway
         ];
     }
 
-    /**
-     * Get order info for frontend
-     * This is called from the frontend checkout to get payment data
-     *
-     * @param array $data
-     * @return void
-     */
     public function getOrderInfo(array $data)
     {
         $settings = $this->settings->get();
         $selectedChannels = $this->settings->getPaymentChannels();
 
-        // Map channel IDs to names
         $channelNames = [
             1 => __('FPX (Online Banking)', 'bayarcash-for-fluentcart'),
             3 => __('FPX Direct Debit', 'bayarcash-for-fluentcart'),
@@ -381,15 +313,12 @@ class BayarcashGateway extends AbstractPaymentGateway
             15 => __('PromptPay', 'bayarcash-for-fluentcart')
         ];
 
-        // Build available channels array
         $availableChannels = [];
         if (empty($selectedChannels)) {
-            // If no channels selected, show all
             foreach ($channelNames as $id => $name) {
                 $availableChannels[] = ['id' => $id, 'name' => $name];
             }
         } else {
-            // Show only selected channels
             foreach ($selectedChannels as $channelId) {
                 if (isset($channelNames[$channelId])) {
                     $availableChannels[] = ['id' => $channelId, 'name' => $channelNames[$channelId]];

@@ -20,9 +20,6 @@ define('BAYARCASH_FC_VERSION', '1.0.0');
 define('BAYARCASH_FC_DIR', plugin_dir_path(__FILE__));
 define('BAYARCASH_FC_URL', plugin_dir_url(__FILE__));
 
-/**
- * Load Composer autoloader
- */
 if (!file_exists(BAYARCASH_FC_DIR . 'vendor/autoload.php')) {
     add_action('admin_notices', function() {
         echo '<div class="notice notice-error"><p>';
@@ -31,50 +28,32 @@ if (!file_exists(BAYARCASH_FC_DIR . 'vendor/autoload.php')) {
         );
         echo '</p></div>';
     });
-    return; // Stop plugin execution if autoloader is missing
+    return;
 }
 
 require_once BAYARCASH_FC_DIR . 'vendor/autoload.php';
 
-/**
- * Initialize the Bayarcash Payment Gateway
- */
 add_action('fluent_cart/register_payment_methods', function() {
-    // Check if FluentCart is active
     if (!function_exists('fluent_cart_api')) {
         return;
     }
 
-    // Register the gateway - Composer autoloader will handle class loading
     $gateway = new \BayarcashForFluentCart\BayarcashGateway();
     fluent_cart_api()->registerCustomPaymentMethod('bayarcash', $gateway);
 });
 
-/**
- * Handle Bayarcash return URL on template redirect
- * This catches the receipt page load and processes Bayarcash params
- */
 add_action('template_redirect', function() {
-    // Create processor instance
     $settings = new \BayarcashForFluentCart\BayarcashSettings();
     $processor = new \BayarcashForFluentCart\BayarcashProcessor($settings);
-
-    // Handle return if Bayarcash params detected
     $processor->handleReturn();
-}, 5); // Priority 5 to run early
+}, 5);
 
-/**
- * Add settings link on plugins page
- */
 add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) {
     $settings_link = '<a href="' . admin_url('admin.php?page=fluent-cart#/settings/payment-gateways') . '">' . __('Settings', 'bayarcash-for-fluentcart') . '</a>';
     array_unshift($links, $settings_link);
     return $links;
 });
 
-/**
- * Check if FluentCart is installed and active
- */
 add_action('admin_notices', function() {
     if (!defined('FLUENTCART_VERSION')) {
         echo '<div class="notice notice-error"><p>';
