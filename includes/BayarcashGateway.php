@@ -13,14 +13,14 @@ class BayarcashGateway extends AbstractPaymentGateway
     /**
      * @var BayarcashProcessor
      */
-    protected $processor;
+    public $processor;
 
     /**
      * Supported features
      *
      * @var array
      */
-    public array $supportedFeatures = ['payment', 'webhook'];
+    public array $supportedFeatures = ['payment'];
 
     /**
      * Constructor
@@ -30,6 +30,11 @@ class BayarcashGateway extends AbstractPaymentGateway
         $settings = new BayarcashSettings();
         parent::__construct($settings);
         $this->processor = new BayarcashProcessor($this->settings);
+
+        add_filter('fluent_cart/payment_methods_with_custom_checkout_buttons', function ($methods) {
+            $methods[] = 'bayarcash';
+            return $methods;
+        });
     }
 
     /**
@@ -51,10 +56,13 @@ class BayarcashGateway extends AbstractPaymentGateway
             'title' => __('Bayarcash', 'bayarcash-for-fluentcart'),
             'route' => 'bayarcash',
             'slug' => 'bayarcash',
-            'logo' => BAYARCASH_FC_URL . 'assets/images/bayarcash-logo.png',
             'description' => __('Accept payments via Bayarcash - FPX, DuitNow QR, and more', 'bayarcash-for-fluentcart'),
+            'logo' => BAYARCASH_FC_URL . 'assets/img/bayarcash-icon.png',
+            'icon' => BAYARCASH_FC_URL . 'assets/img/bayarcash-icon.png',
+            'brand_color' => '#00a651',
             'status' => $this->settings->get('is_active') === 'yes',
             'upcoming' => false,
+            'supported_features' => $this->supportedFeatures,
         ];
     }
 
@@ -66,6 +74,11 @@ class BayarcashGateway extends AbstractPaymentGateway
     public function fields(): array
     {
         return [
+            'notice' => [
+                'value' => $this->renderStoreModeNotice(),
+                'label' => __('Store Mode Notice', 'bayarcash-for-fluentcart'),
+                'type' => 'notice'
+            ],
             'bayarcash_description' => [
                 'value' => sprintf(
                     '<div class="pt-4">
@@ -81,95 +94,141 @@ class BayarcashGateway extends AbstractPaymentGateway
                 'label' => __('Description', 'bayarcash-for-fluentcart'),
                 'type' => 'html_attr'
             ],
-            'payment_mode' => [
-                'label' => __('Payment Mode', 'bayarcash-for-fluentcart'),
-                'type' => 'payment_mode_selector',
-                'options' => [
-                    'test' => __('Test Mode', 'bayarcash-for-fluentcart'),
-                    'live' => __('Live Mode', 'bayarcash-for-fluentcart')
-                ],
-                'default' => 'test',
-                'help' => __('Select Test Mode for testing payments, Live Mode for production', 'bayarcash-for-fluentcart')
-            ],
-            'test_api_token' => [
-                'label' => __('Test API Token', 'bayarcash-for-fluentcart'),
-                'type' => 'password',
-                'help' => __('Enter your Bayarcash test API token', 'bayarcash-for-fluentcart'),
-                'conditional_logic' => [
-                    [
-                        'key' => 'payment_mode',
-                        'compare' => '=',
-                        'value' => 'test'
-                    ]
-                ]
-            ],
-            'test_api_secret' => [
-                'label' => __('Test API Secret Key', 'bayarcash-for-fluentcart'),
-                'type' => 'password',
-                'help' => __('Enter your Bayarcash test API secret key', 'bayarcash-for-fluentcart'),
-                'conditional_logic' => [
-                    [
-                        'key' => 'payment_mode',
-                        'compare' => '=',
-                        'value' => 'test'
-                    ]
-                ]
-            ],
             'live_api_token' => [
-                'label' => __('Live API Token', 'bayarcash-for-fluentcart'),
-                'type' => 'password',
-                'help' => __('Enter your Bayarcash live API token', 'bayarcash-for-fluentcart'),
-                'conditional_logic' => [
-                    [
-                        'key' => 'payment_mode',
-                        'compare' => '=',
-                        'value' => 'live'
-                    ]
-                ]
+                'type' => 'text',
+                'label' => __('Personal Access Token (PAT)', 'bayarcash-for-fluentcart'),
+                'placeholder' => __('Enter your Personal Access Token', 'bayarcash-for-fluentcart'),
+                'help' => __('Enter your Bayarcash Personal Access Token from your dashboard', 'bayarcash-for-fluentcart')
             ],
             'live_api_secret' => [
-                'label' => __('Live API Secret Key', 'bayarcash-for-fluentcart'),
-                'type' => 'password',
-                'help' => __('Enter your Bayarcash live API secret key', 'bayarcash-for-fluentcart'),
-                'conditional_logic' => [
-                    [
-                        'key' => 'payment_mode',
-                        'compare' => '=',
-                        'value' => 'live'
-                    ]
-                ]
+                'label' => __('API Secret Key', 'bayarcash-for-fluentcart'),
+                'type' => 'text',
+                'placeholder' => __('Enter your API Secret Key', 'bayarcash-for-fluentcart'),
+                'help' => __('Enter your Bayarcash API secret key from your dashboard', 'bayarcash-for-fluentcart')
             ],
             'portal_key' => [
                 'label' => __('Portal Key', 'bayarcash-for-fluentcart'),
                 'type' => 'text',
-                'help' => __('Enter your Bayarcash portal key', 'bayarcash-for-fluentcart')
+                'placeholder' => __('Enter your Portal Key', 'bayarcash-for-fluentcart'),
+                'help' => __('Enter your Bayarcash portal key from your dashboard', 'bayarcash-for-fluentcart')
             ],
-            'payment_description' => [
-                'label' => __('Payment Description', 'bayarcash-for-fluentcart'),
+            'payment_channels' => [
+                'label' => __('Payment Channels', 'bayarcash-for-fluentcart'),
+                'type' => 'checkbox_group',
+                'options' => [
+                    '1' => __('FPX (Online Banking)', 'bayarcash-for-fluentcart'),
+                    '3' => __('FPX Direct Debit', 'bayarcash-for-fluentcart'),
+                    '4' => __('FPX Line of Credit', 'bayarcash-for-fluentcart'),
+                    '5' => __('DuitNow Online Banking/Wallets', 'bayarcash-for-fluentcart'),
+                    '6' => __('DuitNow QR', 'bayarcash-for-fluentcart'),
+                    '8' => __('Boost PayFlex', 'bayarcash-for-fluentcart'),
+                    '9' => __('QRIS (Online Banking)', 'bayarcash-for-fluentcart'),
+                    '10' => __('QRIS (E-Wallet)', 'bayarcash-for-fluentcart'),
+                    '11' => __('NETS', 'bayarcash-for-fluentcart'),
+                    '12' => __('Credit Card', 'bayarcash-for-fluentcart'),
+                    '13' => __('Alipay', 'bayarcash-for-fluentcart'),
+                    '14' => __('WeChat Pay', 'bayarcash-for-fluentcart'),
+                    '15' => __('PromptPay', 'bayarcash-for-fluentcart')
+                ],
+                'default' => ['1', '6'],
+                'help' => __('Select which payment channels to enable. Leave empty to show all available channels.', 'bayarcash-for-fluentcart')
+            ],
+            'bayarcash_checkout_theme' => [
+                'value' => 'light',
+                'label' => __('Bayarcash Checkout Theme', 'bayarcash-for-fluentcart'),
+                'type' => 'select',
+                'options' => [
+                    'light' => [
+                        'label' => __('Light', 'bayarcash-for-fluentcart'),
+                        'value' => 'light'
+                    ],
+                    'dark' => [
+                        'label' => __('Dark', 'bayarcash-for-fluentcart'),
+                        'value' => 'dark'
+                    ]
+                ],
+                'tooltip' => __('Theme to use for Bayarcash checkout page', 'bayarcash-for-fluentcart')
+            ],
+            'bayarcash_checkout_button_text' => [
+                'value' => __('Pay with Bayarcash', 'bayarcash-for-fluentcart'),
+                'label' => __('Bayarcash Checkout Button Text', 'bayarcash-for-fluentcart'),
                 'type' => 'text',
-                'default' => 'Payment for Order #{{order_id}}',
-                'help' => __('Description shown to customer during payment. Use {{order_id}} for order number', 'bayarcash-for-fluentcart')
+                'placeholder' => __('Pay with Bayarcash', 'bayarcash-for-fluentcart'),
+                'tooltip' => __('Text to display on the Bayarcash checkout button', 'bayarcash-for-fluentcart')
             ],
-            'payment_button_label' => [
-                'label' => __('Payment Button Label', 'bayarcash-for-fluentcart'),
+            'bayarcash_checkout_button_color' => [
+                'value' => '',
+                'label' => __('Bayarcash Checkout Button Color', 'bayarcash-for-fluentcart'),
+                'type' => 'color',
+                'tooltip' => __('Color of the Bayarcash checkout button', 'bayarcash-for-fluentcart')
+            ],
+            'bayarcash_checkout_button_hover_color' => [
+                'value' => '',
+                'label' => __('Bayarcash Checkout Button Hover Color', 'bayarcash-for-fluentcart'),
+                'type' => 'color',
+                'tooltip' => __('Hover color of the Bayarcash checkout button', 'bayarcash-for-fluentcart')
+            ],
+            'bayarcash_checkout_button_text_color' => [
+                'value' => '',
+                'label' => __('Bayarcash Checkout Button Text Color', 'bayarcash-for-fluentcart'),
+                'type' => 'color',
+                'tooltip' => __('Text color of the Bayarcash checkout button', 'bayarcash-for-fluentcart')
+            ],
+            'bayarcash_checkout_button_font_size' => [
+                'value' => '16px',
+                'label' => __('Bayarcash Checkout Button Font Size', 'bayarcash-for-fluentcart'),
                 'type' => 'text',
-                'default' => __('Pay with Bayarcash', 'bayarcash-for-fluentcart'),
-                'help' => __('Text displayed on the payment button', 'bayarcash-for-fluentcart')
-            ],
-            'webhook_url' => [
-                'value' => sprintf(
-                    '<div class="pt-4">
-                        <p><strong>%s:</strong></p>
-                        <code style="display: block; padding: 10px; background: #f5f5f5; margin-top: 5px;">%s</code>
-                        <p class="description" style="margin-top: 10px;">%s</p>
-                    </div>',
-                    __('Webhook URL', 'bayarcash-for-fluentcart'),
-                    $this->settings->getWebhookUrl(),
-                    __('Copy this URL and add it to your Bayarcash dashboard webhook settings', 'bayarcash-for-fluentcart')
-                ),
-                'label' => __('Webhook Configuration', 'bayarcash-for-fluentcart'),
-                'type' => 'html_attr'
+                'placeholder' => __('16px', 'bayarcash-for-fluentcart'),
+                'tooltip' => __('Font size of the Bayarcash checkout button (e.g., 14px, 1rem)', 'bayarcash-for-fluentcart')
             ]
+        ];
+    }
+
+    /**
+     * Validate gateway settings
+     * This method is called by FluentCart when trying to ACTIVATE the gateway (is_active = 'yes')
+     *
+     * @param array $data
+     * @return array
+     */
+    public static function validateSettings($data): array
+    {
+        $storeSettings = new \FluentCart\Api\StoreSettings();
+        $storeMode = $storeSettings->get('order_mode');
+
+        // Validate credentials for both test and live mode
+        $apiToken = trim($data['live_api_token'] ?? '');
+        $apiSecret = trim($data['live_api_secret'] ?? '');
+        $portalKey = trim($data['portal_key'] ?? '');
+
+        if (empty($apiToken)) {
+            return [
+                'status' => 'failed',
+                'message' => __('Personal Access Token (PAT) is required to activate the gateway.', 'bayarcash-for-fluentcart')
+            ];
+        }
+
+        if (empty($apiSecret)) {
+            return [
+                'status' => 'failed',
+                'message' => __('API Secret Key is required to activate the gateway.', 'bayarcash-for-fluentcart')
+            ];
+        }
+
+        if (empty($portalKey)) {
+            return [
+                'status' => 'failed',
+                'message' => __('Portal Key is required to activate the gateway.', 'bayarcash-for-fluentcart')
+            ];
+        }
+
+        $modeMessage = $storeMode === 'test'
+            ? __('Bayarcash test mode is enabled with your credentials.', 'bayarcash-for-fluentcart')
+            : __('Bayarcash gateway credentials verified successfully!', 'bayarcash-for-fluentcart');
+
+        return [
+            'status' => 'success',
+            'message' => $modeMessage
         ];
     }
 
@@ -192,10 +251,17 @@ class BayarcashGateway extends AbstractPaymentGateway
             ];
         }
 
+        // Get selected payment channel from request
+        $selectedChannel = null;
+        if (isset($_REQUEST['bayarcash_selected_channel'])) {
+            $selectedChannel = intval($_REQUEST['bayarcash_selected_channel']);
+        }
+
         // Create payment
-        $result = $this->processor->createPayment($order, $transaction);
+        $result = $this->processor->createPayment($order, $transaction, $selectedChannel);
 
         if (is_wp_error($result)) {
+            error_log('Bayarcash Gateway Error: ' . $result->get_error_message());
             return [
                 'status' => 'failed',
                 'message' => $result->get_error_message()
@@ -210,6 +276,7 @@ class BayarcashGateway extends AbstractPaymentGateway
             ];
         }
 
+        error_log('Bayarcash Gateway Error: No payment URL in result');
         return [
             'status' => 'failed',
             'message' => __('Failed to create payment', 'bayarcash-for-fluentcart')
@@ -217,29 +284,12 @@ class BayarcashGateway extends AbstractPaymentGateway
     }
 
     /**
-     * Handle IPN/Webhook callbacks
+     * Handle IPN callback from Bayarcash (Server-to-Server POST)
+     * Note: This is for backup/webhook support when not localhost
      *
      * @return void
      */
     public function handleIPN()
-    {
-        $action = sanitize_text_field($_REQUEST['action'] ?? '');
-
-        if ($action === 'callback') {
-            $this->handleWebhookCallback();
-        } elseif ($action === 'return') {
-            $this->handleReturnCallback();
-        }
-
-        exit;
-    }
-
-    /**
-     * Handle webhook callback from Bayarcash
-     *
-     * @return void
-     */
-    protected function handleWebhookCallback()
     {
         $callbackData = $_POST;
 
@@ -260,24 +310,6 @@ class BayarcashGateway extends AbstractPaymentGateway
             'message' => 'Callback processed'
         ]);
         exit;
-    }
-
-    /**
-     * Handle return URL callback
-     *
-     * @return void
-     */
-    protected function handleReturnCallback()
-    {
-        $returnData = $_GET;
-        $result = $this->processor->handleReturn($returnData);
-
-        if (!empty($result['redirect_url'])) {
-            wp_redirect($result['redirect_url']);
-            exit;
-        }
-
-        wp_die($result['message'] ?? __('Payment processing error', 'bayarcash-for-fluentcart'));
     }
 
     /**
@@ -312,7 +344,9 @@ class BayarcashGateway extends AbstractPaymentGateway
                 'payment_method' => 'bayarcash',
                 'translations' => [
                     'processing' => __('Processing payment...', 'bayarcash-for-fluentcart'),
-                    'error' => __('Payment error occurred', 'bayarcash-for-fluentcart')
+                    'error' => __('Payment error occurred', 'bayarcash-for-fluentcart'),
+                    'Please select a payment method' => __('Please select a payment method', 'bayarcash-for-fluentcart'),
+                    'Select Payment Method' => __('Select Payment Method', 'bayarcash-for-fluentcart')
                 ]
             ]
         ];
@@ -327,9 +361,61 @@ class BayarcashGateway extends AbstractPaymentGateway
      */
     public function getOrderInfo(array $data)
     {
-        // For redirect-based payments like Bayarcash, we don't need to return
-        // complex payment info to the frontend. The payment is handled via
-        // makePaymentFromPaymentInstance which redirects to Bayarcash.
-        // This method is required by the PaymentGatewayInterface.
+        $settings = $this->settings->get();
+        $selectedChannels = $this->settings->getPaymentChannels();
+
+        // Map channel IDs to names
+        $channelNames = [
+            1 => __('FPX (Online Banking)', 'bayarcash-for-fluentcart'),
+            3 => __('FPX Direct Debit', 'bayarcash-for-fluentcart'),
+            4 => __('FPX Line of Credit', 'bayarcash-for-fluentcart'),
+            5 => __('DuitNow Online Banking/Wallets', 'bayarcash-for-fluentcart'),
+            6 => __('DuitNow QR', 'bayarcash-for-fluentcart'),
+            8 => __('Boost PayFlex', 'bayarcash-for-fluentcart'),
+            9 => __('QRIS (Online Banking)', 'bayarcash-for-fluentcart'),
+            10 => __('QRIS (E-Wallet)', 'bayarcash-for-fluentcart'),
+            11 => __('NETS', 'bayarcash-for-fluentcart'),
+            12 => __('Credit Card', 'bayarcash-for-fluentcart'),
+            13 => __('Alipay', 'bayarcash-for-fluentcart'),
+            14 => __('WeChat Pay', 'bayarcash-for-fluentcart'),
+            15 => __('PromptPay', 'bayarcash-for-fluentcart')
+        ];
+
+        // Build available channels array
+        $availableChannels = [];
+        if (empty($selectedChannels)) {
+            // If no channels selected, show all
+            foreach ($channelNames as $id => $name) {
+                $availableChannels[] = ['id' => $id, 'name' => $name];
+            }
+        } else {
+            // Show only selected channels
+            foreach ($selectedChannels as $channelId) {
+                if (isset($channelNames[$channelId])) {
+                    $availableChannels[] = ['id' => $channelId, 'name' => $channelNames[$channelId]];
+                }
+            }
+        }
+
+        $paymentArgs = [
+            'mode' => $this->settings->getMode(),
+            'bayarcash_checkout_button_text' => $settings['bayarcash_checkout_button_text'] ?? __('Pay with Bayarcash', 'bayarcash-for-fluentcart'),
+            'bayarcash_checkout_button_color' => $settings['bayarcash_checkout_button_color'] ?? '',
+            'bayarcash_checkout_button_hover_color' => $settings['bayarcash_checkout_button_hover_color'] ?? '',
+            'bayarcash_checkout_button_text_color' => $settings['bayarcash_checkout_button_text_color'] ?? '',
+            'bayarcash_checkout_button_font_size' => $settings['bayarcash_checkout_button_font_size'] ?? '16px',
+            'available_channels' => $availableChannels
+        ];
+
+        $paymentDetails = [
+            'theme' => $settings['bayarcash_checkout_theme'] ?? 'light',
+        ];
+
+        wp_send_json([
+            'status' => 'success',
+            'payment_args' => $paymentArgs,
+            'intent' => $paymentDetails,
+            'message' => __('Order info retrieved!', 'bayarcash-for-fluentcart')
+        ], 200);
     }
 }

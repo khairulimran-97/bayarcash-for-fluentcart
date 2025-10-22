@@ -46,11 +46,22 @@ add_action('fluent_cart/register_payment_methods', function() {
     }
 
     // Register the gateway - Composer autoloader will handle class loading
-    fluent_cart_api()->registerCustomPaymentMethod(
-        'bayarcash',
-        new \BayarcashForFluentCart\BayarcashGateway()
-    );
+    $gateway = new \BayarcashForFluentCart\BayarcashGateway();
+    fluent_cart_api()->registerCustomPaymentMethod('bayarcash', $gateway);
 });
+
+/**
+ * Handle Bayarcash return URL on template redirect
+ * This catches the receipt page load and processes Bayarcash params
+ */
+add_action('template_redirect', function() {
+    // Create processor instance
+    $settings = new \BayarcashForFluentCart\BayarcashSettings();
+    $processor = new \BayarcashForFluentCart\BayarcashProcessor($settings);
+
+    // Handle return if Bayarcash params detected
+    $processor->handleReturn();
+}, 5); // Priority 5 to run early
 
 /**
  * Add settings link on plugins page

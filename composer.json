@@ -21,7 +21,7 @@
     ],
     "require": {
         "php": ">=7.4",
-        "webimpian/bayarcash-php-sdk": "^1.0"
+        "webimpian/bayarcash-php-sdk": "*"
     },
     "require-dev": {
         "php": ">=7.4"
