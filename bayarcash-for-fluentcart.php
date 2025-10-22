@@ -65,7 +65,7 @@ add_filter('plugin_action_links_' . plugin_basename(__FILE__), function($links) 
  * Check if FluentCart is installed and active
  */
 add_action('admin_notices', function() {
-    if (!defined('FLUENT_CART_VERSION')) {
+    if (!defined('FLUENTCART_VERSION')) {
         echo '<div class="notice notice-error"><p>';
         echo __('Bayarcash for FluentCart requires FluentCart to be installed and activated.', 'bayarcash-for-fluentcart');
         echo '</p></div>';
