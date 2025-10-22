@@ -3,8 +3,8 @@
 namespace BayarcashForFluentCart;
 
 use FluentCart\App\Models\Order;
-use FluentCart\App\Models\Transaction;
-use FluentCart\App\Services\PaymentGateways\StatusHelper;
+use FluentCart\App\Models\OrderTransaction;
+use FluentCart\App\Helpers\StatusHelper;
 use Webimpian\BayarcashSdk\Bayarcash;
 
 defined('ABSPATH') or exit;
