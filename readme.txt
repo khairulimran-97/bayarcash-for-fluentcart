@@ -1,5 +1,5 @@
 === Bayarcash for FluentCart ===
-Contributors: webimpian
+Contributors: bayarcash
 Tags: bayarcash, payment gateway, fluentcart, fpx, duitnow
 Requires at least: 5.0
 Tested up to: 6.8
